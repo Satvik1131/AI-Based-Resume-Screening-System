@@ -6,8 +6,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 MODELS_DIR = BASE_DIR / "models"
 
-# Pipeline Parameters
-CONFIDENCE_THRESHOLD = 0.55
+# Pipeline Parameters (Problem 4: Calibrated & Evidence-Backed)
+CONFIDENCE_THRESHOLD = 0.65        # Evidence-backed: auto-decides ~69% of cases at ~82% accuracy
+MARGIN_THRESHOLD = 0.10            # Evidence-backed: flags near-ties where top 2 probabilities differ by < 10%
+CALIBRATION_METHOD = "sigmoid"     # Platt scaling calibrator (CalibratedClassifierCV)
+CASCADE_THRESHOLD = 0.65          # Stage-A Match confidence; overridden by calibrated value in model_config
 MIN_SKILL_EVIDENCE = 3
 MIN_RESUME_SKILLS = 2
 OVERQUALIFICATION_RATIO_THRESHOLD = 1.75
@@ -29,7 +32,11 @@ FEATURES = [
     "jd_experience_mentioned",
     "unstated_experience_for_senior_role",
     "semantic_similarity_score",
-    "domain_match"
+    "domain_match",
+    # Boundary-aware features (help distinguish Partial Match)
+    "skill_gap_signed",
+    "experience_gap_years",
+    "skill_balance_ratio",
 ]
 
 FEATURE_LABELS = {
@@ -42,5 +49,8 @@ FEATURE_LABELS = {
     "jd_experience_mentioned": "JD States Required Experience",
     "unstated_experience_for_senior_role": "Unverified Experience vs. Senior Role",
     "semantic_similarity_score": "Overall Semantic Fit",
-    "domain_match": "Domain Match"
+    "domain_match": "Domain Match",
+    "skill_gap_signed": "Skill Breadth Gap (Resume vs JD)",
+    "experience_gap_years": "Experience Gap (Years)",
+    "skill_balance_ratio": "Skill Coverage Balance",
 }

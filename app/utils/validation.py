@@ -60,10 +60,40 @@ def validate_job(job: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
 
     company = cleaned_company
 
+    # Guard: if "company" is more than 8 words, it's likely a description, not a name
+    if len(company.split()) > 8:
+        warnings.append(
+            f"Company field truncated (was {len(cleaned_company.split())} words — likely a description): '{cleaned_company[:60]}...'"
+        )
+        company = "Company Not Identified"
+
     # Reject: missing designation — this is the truly unrecoverable field
     if not designation:
         warnings.append(
             f"Rejected job at '{company}': designation is empty."
+        )
+        return {}, warnings
+
+    # Reject: volunteer work is excluded from professional experience
+    if re.search(r"\b(volunteer|volunteering|community service)\b", designation, re.IGNORECASE):
+        warnings.append(
+            f"Rejected job at '{company}': designation '{designation}' is volunteer work, which does not count as professional experience."
+        )
+        return {}, warnings
+
+    # Reject: academic terms, degrees, or milestones accidentally extracted as job designations
+    _ACADEMIC_TERMS = {
+        "graduation", "post graduation", "undergraduate", "postgraduate",
+        "education", "academics", "academic", "bachelor", "master", "doctorate",
+        "phd", "btech", "b.tech", "mtech", "m.tech", "bca", "mca", "bba", "mba",
+        "high school", "senior secondary", "secondary school", "matriculation",
+        "intermediate", "10th", "12th", "diploma", "coursework", "student",
+        "scholarships", "scholarship", "honors list",
+    }
+    desig_clean = designation.lower().strip().rstrip(".:- ")
+    if desig_clean in _ACADEMIC_TERMS or re.search(r"^(graduation|post\s*graduation|undergraduate|postgraduate)\b", desig_clean):
+        warnings.append(
+            f"Rejected job at '{company}': designation '{designation}' is an academic milestone or degree, not a professional job."
         )
         return {}, warnings
 

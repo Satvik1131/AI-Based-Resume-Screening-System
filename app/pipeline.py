@@ -78,8 +78,8 @@ def screen_candidate(
       Falls back to original full-resume LLM extraction on raw text.
 
     Either path then continues with:
-      6. Build 10-feature vector
-      7. RandomForest prediction + SHAP explanations
+      6. Build 13-feature vector (10 original + 3 boundary-aware)
+      7. Two-stage cascade classifier + SHAP explanations
       8. Assemble final report
     """
     if is_file:
@@ -121,12 +121,12 @@ def screen_candidate(
 
     # ── Steps shared by both paths ─────────────────────────────────────
 
-    # Step 1: Build 10-Feature Vector (UNTOUCHED)
+    # Step 1: Build 13-Feature Vector (10 original + 3 boundary-aware)
     feature_data = build_feature_vector(
         resume_text_for_features, jd_text, llm_extracted
     )
 
-    # Step 2: RandomForest Prediction & SHAP Explanations (UNTOUCHED)
+    # Step 2: Two-Stage Cascade Prediction & SHAP Explanations
     ml_eval = evaluate_candidate_ml(feature_data)
 
     # Step 3: Assemble Final Report (includes LLM insights now)

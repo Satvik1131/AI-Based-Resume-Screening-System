@@ -48,6 +48,26 @@ def is_present(s: str) -> bool:
     }
 
 
+# ---------------------------------------------------------------------------
+# Date string repair (PDF extraction artifacts)
+# ---------------------------------------------------------------------------
+
+def _repair_date_string(s: str) -> str:
+    """Fix common garbled date strings from PDF extraction."""
+    s = s.strip()
+    # Truncated year: "July 202" -> "July 2020" (assume trailing zero)
+    m = re.match(r'^([a-zA-Z]+\.?\s+)(\d{3})$', s)
+    if m:
+        return m.group(1) + m.group(2) + '0'
+    # Apostrophe shorthand: "Jan'21" -> "Jan 2021"
+    m = re.match(r"^([a-zA-Z]+)'(\d{2})$", s)
+    if m:
+        year_2d = int(m.group(2))
+        year_4d = 2000 + year_2d if year_2d < 70 else 1900 + year_2d
+        return f"{m.group(1)} {year_4d}"
+    return s
+
+
 def parse_date_flexible(s: str) -> Optional[datetime]:
     """
     Parse a human-readable date string into a datetime.
@@ -59,13 +79,15 @@ def parse_date_flexible(s: str) -> Optional[datetime]:
       - "01/2021" / "2021/01"
       - "2021-01" / "01-2021"
       - "01-01-2021" / "2021-01-01" / "01/01/2021"
+      - "July 202" (truncated year → repaired to "July 2020")
+      - "Jan'21" (apostrophe shorthand → "Jan 2021")
 
     Returns None if the string cannot be parsed.
     """
     if not s:
         return None
 
-    s_clean = s.strip()
+    s_clean = _repair_date_string(s.strip())
     
     # Check YYYY-MM / MM-YYYY / YYYY/MM / MM/YYYY before range splitting
     m = re.match(r"^(\d{4})[\-–—/](\d{1,2})$", s_clean)

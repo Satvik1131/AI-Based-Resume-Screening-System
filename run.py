@@ -110,7 +110,7 @@ def main():
     print("[1/4] Parsing resume with Docling ...")
     print("[2/4] Detecting sections + running LLM extraction ...")
     print("[3/4] Calculating experience in Python ...")
-    print("[4/4] Running Random Forest + SHAP ...")
+    print("[4/4] Running Cascade Classifier + SHAP ...")
     print()
 
     try:

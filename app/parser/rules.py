@@ -53,19 +53,51 @@ _DATE_RANGE_RE = re.compile(
 
 _DATE_SPLIT_RE = re.compile(r"\s*[\-–—]\s*|\s+to\s+", re.IGNORECASE)
 
-_DEGREE_RE = re.compile(
-    r"\b(b\.?\s*tech|b\.?\s*e\.?|b\.?\s*sc|b\.?\s*a\.?|b\.?\s*com|bba|bca|"
-    r"m\.?\s*tech|m\.?\s*e\.?|m\.?\s*sc|mba|m\.?\s*a\.?|mca|"
-    r"ph\.?\s*d\.?|doctorate|diploma|b\.?\s*arch|b\.?\s*pharm|"
-    r"bachelor|master|associate)\b",
+# Case-sensitive short degree acronyms:
+_SHORT_DEGREE_EXACT_RE = re.compile(
+    r"\b(BE|ME|BS|MS|BA|MA|M\.Phil|MPhil)\b"
+)
+
+# General degrees (case-insensitive):
+_DEGREE_GENERAL_RE = re.compile(
+    r"\b(b\.?\s*tech\.?|btech|b\.?\s*e\.|beng|"
+    r"b\.?\s*sc\.?|b\.?\s*a\.|b\.?\s*com\.?|bba|bca|barch|b\.?\s*arch\.?|"
+    r"b\.?\s*pharm\.?|bpharm|llb|mbbs|bds|"
+    r"m\.?\s*tech\.?|mtech|m\.?\s*e\.|m\.?\s*sc\.?|mba|m\.?\s*a\.|mca|"
+    r"m\.?\s*eng\.?|m\.?\s*pharm\.?|llm|m\.?\s*phil\.?|mphil|"
+    r"ph\.?\s*d\.?|phd|doctorate|"
+    r"diploma|polytechnic|"
+    r"bachelor'?s?|master'?s?|associate'?s?|"
+    r"high\s+school|senior\s+secondary|hsc|ssc|12th|10th)\b",
     re.IGNORECASE,
 )
 
+def _matches_degree(text: str) -> bool:
+    """Matches degrees, ensuring BE, ME, BS, MS, BA, MA are strictly case-sensitive and adds M.Phil."""
+    return bool(_DEGREE_GENERAL_RE.search(text) or _SHORT_DEGREE_EXACT_RE.search(text))
+
+# Backwards compatibility alias
+_DEGREE_RE = _DEGREE_GENERAL_RE
+
+# Enhanced GPA pattern: matches decimals, integers, percentages, and /10 or /4 scales
+# e.g., "CGPA: 8.82", "GPA: 9", "8.82/10", "3.9/4.0", "Percentage: 85%", "78%", "CPI: 8.5"
 _GPA_RE = re.compile(
-    # Matches: "CGPA: 8.82", "GPA: 3.9", "CGPA (latest):8.82", "CGPA (Sem 4): 8.82"
-    r"(?:gpa|cgpa|cpi|sgpa|percentage)[\w\s()]*?:?\s*([0-9]+\.[0-9]+)",
+    r"(?:cgpa|gpa|cpi|sgpa|percentage|marks?|aggregate)[\w\s()]*?:?\s*([0-9]+(?:\.[0-9]+)?(?:\s*/\s*[0-9]+(?:\.[0-9]+)?|%)?)"
+    r"|(\b[0-9]+(?:\.[0-9]+)?\s*/\s*(?:10|4)(?:\.0)?\b)"
+    r"|(\b[0-9]{2}(?:\.[0-9]+)?\s*%)",
     re.IGNORECASE,
 )
+
+def _extract_gpa_token(text: str) -> tuple[str, str]:
+    """Extracts (gpa_string, text_without_gpa). Handles ints, floats, %, and /10 or /4 scales."""
+    m = _GPA_RE.search(text)
+    if not m:
+        return "", text
+    matched_full = m.group(0)
+    raw_val = m.group(1) or m.group(2) or m.group(3) or matched_full
+    raw_val = raw_val.replace(" ", "")
+    cleaned = text.replace(matched_full, " ").strip()
+    return raw_val, cleaned
 
 # Known role keywords — a line containing any of these is likely a job title
 _ROLE_KW = {
@@ -118,14 +150,16 @@ def _strip_bullet(line: str) -> str:
 def _parse_date_range(line: str) -> tuple[str, str]:
     """Split a date-range string into (start, end). Returns ('', '') on failure."""
     line = line.strip()
-    parts = _DATE_SPLIT_RE.split(line, maxsplit=1)
+    # Strip any leading label like "Graduation :", "Duration:", "Batch:", "Tenure:"
+    cleaned_line = re.sub(r"^[a-zA-Z\s]+:\s*", "", line).strip()
+    parts = _DATE_SPLIT_RE.split(cleaned_line, maxsplit=1)
     if len(parts) == 2:
         return parts[0].strip(), parts[1].strip()
     # Single date with 'Present' keyword
-    if re.search(r"\bpresent\b", line, re.IGNORECASE):
-        yr = re.search(r"((?:19|20)\d{2})", line)
-        return (yr.group(1) if yr else line), "Present"
-    return line, ""
+    if re.search(r"\bpresent\b", cleaned_line, re.IGNORECASE):
+        yr = re.search(r"((?:19|20)\d{2})", cleaned_line)
+        return (yr.group(1) if yr else cleaned_line), "Present"
+    return cleaned_line, ""
 
 
 def _is_role_line(line: str) -> bool:
@@ -139,8 +173,12 @@ def _is_role_line(line: str) -> bool:
         
     line_lower = line.lower()
     
-    # Explicitly reject common non-roles that are title-cased
+    # Explicitly reject common non-roles that are title-cased or volunteer roles
     if any(x in line_lower for x in ["my webpage", "google scholar", "linkedin", "github"]):
+        return False
+    if re.search(r"\b(volunteer|volunteering)\b", line_lower):
+        return False
+    if re.search(r"\b(graduation|post\s*graduation|undergraduate|postgraduate|PhD|matriculation|intermediate|coursework|scholarship|honors?\s*list)\b", line_lower):
         return False
 
     # Handle inline company names like "Cloud Engineer, Google" or "Data Scientist | Meta"
@@ -336,7 +374,7 @@ def extract_education_rules(section_text: str) -> dict:
     for i, line in enumerate(lines):
         if i in used_indices:
             continue
-        if not _DEGREE_RE.search(line):
+        if not _matches_degree(line):
             continue
 
         degree = line
@@ -344,6 +382,13 @@ def extract_education_rules(section_text: str) -> dict:
         start_date = ""
         end_date = ""
         gpa = ""
+
+        # Check degree line itself for embedded GPA (e.g. "B. Tech in Computer Science with a CGPA of 9.15")
+        gpa_val, cleaned_deg = _extract_gpa_token(degree)
+        if gpa_val:
+            gpa = gpa_val
+            degree = re.sub(r"\bwith\s+(?:a\s+)?(?:cgpa|gpa|cpi|percentage)?.*$", "", cleaned_deg, flags=re.IGNORECASE).strip()
+            degree = degree.rstrip(":,.- ")
 
         context_start = max(0, i - 2)
         context_end = min(len(lines), i + 4)
@@ -355,16 +400,15 @@ def extract_education_rules(section_text: str) -> dict:
             ctx = lines[ci]
 
             # GPA
-            gpa_m = _GPA_RE.search(ctx)
-            if gpa_m and not gpa:
-                gpa = gpa_m.group(1)
+            gpa_ctx, clean_ctx = _extract_gpa_token(ctx)
+            if gpa_ctx and not gpa:
+                gpa = gpa_ctx
                 consumed.add(ci)
                 # Institution may be embedded in the same line as GPA
                 # e.g. "JK Lakshmipat University, Jaipur [Sem 4th] CGPA (latest):8.82."
                 if not institution:
-                    clean_inst = _GPA_RE.sub("", ctx).strip()
-                    clean_inst = re.sub(r"\[.*?\]", "", clean_inst).strip()
-                    clean_inst = re.sub(r"[^\x00-\x7F]+", "", clean_inst).strip()  # strip non-ASCII (°, etc.)
+                    clean_inst = re.sub(r"\[.*?\]", "", clean_ctx).strip()
+                    clean_inst = re.sub(r"[^\x00-\x7F]+", "", clean_inst).strip()  # strip non-ASCII
                     clean_inst = clean_inst.rstrip(",. ").strip()
                     if len(clean_inst.split()) >= 2:
                         institution = clean_inst
@@ -378,7 +422,7 @@ def extract_education_rules(section_text: str) -> dict:
 
             # Institution — non-degree, non-bullet, multi-word
             if (not institution
-                    and not _DEGREE_RE.search(ctx)
+                    and not _matches_degree(ctx)
                     and not _is_bullet(ctx)
                     and not _is_date_line(ctx)
                     and len(ctx.split()) >= 2

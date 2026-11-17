@@ -155,7 +155,10 @@ def print_candidate_report(report: dict):
     print("="*70)
     pred = report.get('prediction', 'unknown')
     conf = report.get('confidence', 0.0)
-    print(f"  PREDICTION   : {pred.upper()}  (Confidence: {conf:.0%})")
+    margin = report.get('margin')
+    margin_str = f" | Margin: {margin:.0%}" if margin is not None else ""
+    cal_tag = " [Calibrated]" if report.get("is_calibrated") else ""
+    print(f"  PREDICTION   : {pred.upper()}  (Confidence: {conf:.0%}{margin_str}){cal_tag}")
     
     engine = report.get('extraction_method') or report.get('extraction_engine') or 'N/A'
     print(f"  ENGINE       : {engine}")

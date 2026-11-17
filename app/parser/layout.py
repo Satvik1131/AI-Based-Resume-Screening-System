@@ -512,6 +512,26 @@ def parse_resume_document(file_path: str) -> ResumeDocument:
         return _empty_document(file_path, "docx_failed", warnings)
 
     if ext == ".pdf":
+        # 1. Analyze layout complexity with LayoutRouter
+        try:
+            from app.parser.router import analyze_document_layout
+            layout_info = analyze_document_layout(file_path)
+            logger.info("[Parser] Router recommendation: %s (complexity: %s)", layout_info.recommended_path, layout_info.complexity.value)
+
+            if layout_info.recommended_path == "heavy":
+                try:
+                    from app.parser.vision_models import parse_with_vision_model
+                    v_doc = parse_with_vision_model(file_path)
+                    if v_doc:
+                        v_doc.parser_warnings = warnings
+                        return v_doc
+                    warnings.append("Vision heavy path returned None; falling back to standard pipeline")
+                except Exception as exc:
+                    warnings.append(f"Vision heavy path failed: {exc}")
+        except Exception as exc:
+            logger.warning("[Parser] Layout router check skipped: %s", exc)
+
+        # 2. Standard fast fallback chain
         for parser_fn, name in [
             (_parse_with_pymupdf, "PyMuPDF"),
             (_parse_with_docling, "Docling"),

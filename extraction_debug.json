@@ -1,0 +1,206 @@
+{
+  "features": {
+    "skill_match_score": 0.12,
+    "matched_skill_count": 2,
+    "missing_skill_count": 14,
+    "experience_match_score": 1.0,
+    "experience_ratio": 4.4,
+    "resume_experience_mentioned": 1,
+    "jd_experience_mentioned": 1,
+    "unstated_experience_for_senior_role": 0,
+    "semantic_similarity_score": 0.3554,
+    "domain_match": 1,
+    "skill_gap_signed": -2,
+    "experience_gap_years": 6.8,
+    "skill_balance_ratio": 0.125
+  },
+  "candidate_name": "Mayank Kundalwal",
+  "resume_skills": [
+    "artificial intelligence",
+    "communication",
+    "computer vision",
+    "cplusplus",
+    "data science",
+    "deep learning",
+    "express",
+    "java",
+    "keras",
+    "machine learning",
+    "prototyping",
+    "python",
+    "pytorch",
+    "tensorflow"
+  ],
+  "jd_skills": [
+    "agile",
+    "ai agents",
+    "artificial intelligence",
+    "databricks",
+    "express",
+    "javascript",
+    "leadership",
+    "llm",
+    "mongodb",
+    "nodejs",
+    "pinecone",
+    "problem solving",
+    "rag",
+    "react",
+    "rest api",
+    "sql"
+  ],
+  "matched_skills": [
+    "artificial intelligence",
+    "express"
+  ],
+  "missing_skills": [
+    "agile",
+    "ai agents",
+    "databricks",
+    "javascript",
+    "leadership",
+    "llm",
+    "mongodb",
+    "nodejs",
+    "pinecone",
+    "problem solving",
+    "rag",
+    "react",
+    "rest api",
+    "sql"
+  ],
+  "resume_experience": 8.8,
+  "jd_experience": 2.0,
+  "is_overqualified": true,
+  "resume_domain": "Data Science",
+  "jd_domain": "Data Science",
+  "education_degree": "2019\u20132025 PhD",
+  "education_level": "Doctorate",
+  "certifications": [],
+  "extraction_method": "Rules_Primary_LLM_Fallback",
+  "prediction": "partial match",
+  "confidence": 0.52,
+  "margin": 0.04,
+  "is_calibrated": true,
+  "needs_human_review": true,
+  "review_reason": "severe skill mismatch (<25% skills matched)",
+  "reasons": [
+    {
+      "factor": "Overall Semantic Fit",
+      "value": 0.36,
+      "direction": "worked against",
+      "impact": -0.118
+    },
+    {
+      "factor": "Domain Match",
+      "value": 1.0,
+      "direction": "supported",
+      "impact": 0.064
+    },
+    {
+      "factor": "Skill Breadth Gap (Resume vs JD)",
+      "value": -2.0,
+      "direction": "supported",
+      "impact": 0.053
+    },
+    {
+      "factor": "Number of Matched Skills",
+      "value": 2.0,
+      "direction": "supported",
+      "impact": 0.036
+    }
+  ],
+  "dynamic_recommendations": [
+    {
+      "skill": "agile",
+      "resource": "Industry-standard certification or hands-on portfolio project in Agile"
+    },
+    {
+      "skill": "ai agents",
+      "resource": "Industry-standard certification or hands-on portfolio project in Ai Agents"
+    },
+    {
+      "skill": "databricks",
+      "resource": "Industry-standard certification or hands-on portfolio project in Databricks"
+    },
+    {
+      "skill": "javascript",
+      "resource": "Industry-standard certification or hands-on portfolio project in Javascript"
+    },
+    {
+      "skill": "leadership",
+      "resource": "Industry-standard certification or hands-on portfolio project in Leadership"
+    }
+  ],
+  "llm_insights": {
+    "fit_summary": "Mayank Kundalwal has a strong foundation in artificial intelligence and express, but lacks experience in leadership, problem-solving, and certain technical skills required for this Data Science role. While he has a PhD in Data Science, his semantic fit score is low, indicating a need for more direct relevance to the job duties. Overall, he may be overqualified for this position.",
+    "strengths": [
+      "Strong background in AI and Express",
+      "PhD in Data Science with relevant education",
+      "8.8 years of candidate experience"
+    ],
+    "gaps_and_risks": [
+      {
+        "gap": "Lack of experience in leadership and problem-solving",
+        "severity": "HIGH",
+        "mitigation": "Providing training or mentorship to develop these skills"
+      },
+      {
+        "gap": "Missing skills in SQL, MongoDB, and Node.js",
+        "severity": "MEDIUM",
+        "mitigation": "Offering online courses or training to fill these gaps"
+      },
+      {
+        "gap": "Inadequate certifications or relevant experience",
+        "severity": "LOW",
+        "mitigation": "Highlighting transferable skills or certifications that demonstrate relevant expertise"
+      }
+    ],
+    "career_trajectory": "Mayank's growth potential is hindered by the lack of experience in leadership and problem-solving, which are crucial for advancement in a Data Science role.",
+    "source": "ollama_llm"
+  },
+  "parsing_metadata": {
+    "parser_used": "docx",
+    "extraction_method": "Rules_Primary_LLM_Fallback",
+    "warnings": [],
+    "sections_detected": [
+      "header",
+      "education",
+      "interests",
+      "experience",
+      "skills",
+      "projects",
+      "publications",
+      "awards",
+      "references"
+    ],
+    "gap_analysis": []
+  },
+  "parsed_resume": {
+    "name": "Mayank Kundalwal",
+    "email": "kundalwal.1@iitj.ac.in",
+    "phone": "+91) 9261444448",
+    "jobs": [
+      {
+        "company": "Manipal University Jaipur",
+        "designation": "Assistant Professor",
+        "start_date": "2018",
+        "end_date": "2019 Cloud Engineer, Cloudminister Technologies Pvt. Ltd., Jaipur, India.",
+        "employment_type": "",
+        "description": [],
+        "confidence": 0.9
+      }
+    ],
+    "education": [
+      {
+        "institution": "Privacy-Preservation Framework for Cloud-Based Healthcare Systems\t . 20122016 B.Tech, Computer Science & Engineering, Poornima University,\t CGPA: 7.38",
+        "degree": "2019\u20132025 PhD, Computer Science & Engineering, Indian Institute of Technology, Jodhpur, Towards Robust Privacy-preserving Federated Learning under Heterogeneous Environments for Medical Imaging Applications.",
+        "field": "",
+        "start_date": "2016",
+        "end_date": "2018 M.Tech, Computer Science & Engineering, NIT Patna,",
+        "gpa": "8.24",
+        "confidence": 0.85
+      }
+    ]
+  }
+}

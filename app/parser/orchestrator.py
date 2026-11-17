@@ -38,7 +38,7 @@ from app.parser.rules import (
     extract_skills_rules,
     extract_certifications_rules,
 )
-from app.parser.experience import calculate_total_experience, separate_internships
+from app.parser.experience import calculate_total_experience, calculate_experience_with_gaps, separate_internships
 from app.parser.education import best_education_record, deduplicate_education_records
 from app.parser.skills import merge_skills
 from app.services.skill_matcher import extract_skills_exact
@@ -184,18 +184,30 @@ def extract_from_document(resume_doc: ResumeDocument) -> dict:
     warnings.extend(job_warnings)
 
     # If no valid jobs were found (e.g. section detector missed heading or rules failed),
-    # run LLM experience extraction on full raw document text as a complete safety net
+    # run LLM experience extraction on full raw document text ONLY IF the document actually
+    # mentions an experience section heading. Do not hallucinate jobs for freshers / students!
     if not valid_jobs:
-        llm_exp = extract_experience_section(resume_doc.raw_text)
-        if not llm_exp.get("error"):
-            raw_jobs2 = llm_exp.get("jobs", [])
-            _patch_orphan_dates(raw_jobs2)
-            valid_jobs2, job_warnings2 = validate_and_clean_jobs(raw_jobs2)
-            if valid_jobs2:
-                valid_jobs = valid_jobs2
-                warnings.extend(job_warnings2)
+        has_exp_heading = bool(
+            re.search(
+                r"\b(professional\s+experience|work\s+experience|employment\s+history|career\s+history|internships?)\b",
+                resume_doc.raw_text,
+                re.IGNORECASE,
+            )
+        )
+        if has_exp_heading:
+            llm_exp = extract_experience_section(resume_doc.raw_text)
+            if not llm_exp.get("error"):
+                raw_jobs2 = llm_exp.get("jobs", [])
+                _patch_orphan_dates(raw_jobs2)
+                valid_jobs2, job_warnings2 = validate_and_clean_jobs(raw_jobs2)
+                if valid_jobs2:
+                    valid_jobs = valid_jobs2
+                    warnings.extend(job_warnings2)
 
     # Calculate total experience in Python — LLM never does this
+    # NOTE: education_list isn't available yet at this point in the pipeline.
+    # We compute a preliminary total_years here for the schema, then recompute
+    # with gap analysis after education extraction is complete (see Step 6b below).
     total_years = calculate_total_experience(valid_jobs)
     _full_time, internships = separate_internships(valid_jobs)
 
@@ -214,6 +226,16 @@ def extract_from_document(resume_doc: ResumeDocument) -> dict:
             warnings.append(f"Education extraction error (LLM): {edu_result['error']}")
 
     education_list = deduplicate_education_records(edu_result.get("education", []))
+
+    # Safety net: If no education records were found from the section, scan raw document text
+    if not education_list:
+        rules_edu_raw = extract_education_rules(resume_doc.raw_text)
+        if rules_edu_raw.get("education"):
+            education_list = deduplicate_education_records(rules_edu_raw["education"])
+        else:
+            llm_edu_raw = extract_education_section(resume_doc.raw_text)
+            if not llm_edu_raw.get("error") and llm_edu_raw.get("education"):
+                education_list = deduplicate_education_records(llm_edu_raw["education"])
 
     # ------------------------------------------------------------------
     # Step 4: Skills — rules first, LLM fallback
@@ -311,6 +333,25 @@ def extract_from_document(resume_doc: ResumeDocument) -> dict:
         extraction_method = "Rules_Primary_LLM_Fallback"
 
     # ------------------------------------------------------------------
+    # Step 6b: Recompute experience with gap-aware analysis
+    # ------------------------------------------------------------------
+    # Now that education records are available, recompute total experience
+    # using gap-aware logic that correctly handles:
+    #   - Small gaps (≤2mo): merged as normal transitions
+    #   - Education-overlapping gaps: excluded from experience
+    #   - Unexplained large gaps: flagged for human review
+    exp_with_gaps = calculate_experience_with_gaps(valid_jobs, education=education_list)
+    total_years = exp_with_gaps["total_years"] if exp_with_gaps["total_years"] is not None else total_years
+    gap_analysis = exp_with_gaps.get("gap_analysis", [])
+
+    # Surface gap warnings for human reviewers
+    for gap in gap_analysis:
+        if gap["tag"] == "unexplained":
+            warnings.append(f"Career gap detected: {gap['detail']}")
+        elif gap["tag"] == "education":
+            warnings.append(f"Career gap (education): {gap['detail']}")
+
+    # ------------------------------------------------------------------
     # Step 9: Assemble and validate canonical schema
     # ------------------------------------------------------------------
     raw_schema = {
@@ -331,6 +372,7 @@ def extract_from_document(resume_doc: ResumeDocument) -> dict:
             "extraction_method": extraction_method,
             "warnings":          warnings,
             "sections_detected": list(sections.keys()),
+            "gap_analysis":      gap_analysis,
         },
     }
 

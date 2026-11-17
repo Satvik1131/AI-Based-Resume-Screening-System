@@ -277,8 +277,8 @@ def _extract_name_by_line_scan(lines: list[str]) -> str:
         if "." in line_clean and not re.fullmatch(r"[A-Za-z\.\s]+", line_clean):
             continue
 
-        # Strip non-alpha chars for name check
-        cleaned = re.sub(r"[^a-zA-Z\s]", "", line_clean).strip()
+        # Preserve hyphens for hyphenated names like "Jean-Pierre"
+        cleaned = re.sub(r"[^a-zA-Z\s\-]", "", line_clean).strip()
         words = cleaned.split()
 
         if not (1 <= len(words) <= 5):
@@ -358,6 +358,8 @@ STRICT RULES:
 - Leave any unknown field as an empty string "".
 - Do NOT calculate or infer total experience.
 - Do NOT use a year number (e.g. "2022") as a company name.
+- company MUST be a proper organization name (1-6 words), NOT a sentence or description.
+- Do NOT extract volunteer work, unpaid community service, or student club activities as professional work experience.
 - Set confidence between 0.0 and 1.0 for each job.
 
 EXACT OUTPUT SCHEMA:

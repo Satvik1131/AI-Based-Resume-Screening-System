@@ -53,6 +53,8 @@ SECTION_ALIASES: dict[str, list[str]] = {
         "academic and research experience",
         "teaching and research experience",
         "professional and research experience",
+        # Issue 6: additional aliases
+        "projects & experience",
     ],
     "education": [
         "education",
@@ -63,6 +65,25 @@ SECTION_ALIASES: dict[str, list[str]] = {
         "educational background",
         "academic credentials",
         "educational qualifications",
+        # Issue 1: additional aliases
+        "academic record",
+        "academics",
+        "scholastic record",
+        "educational details",
+        "degrees",
+        "degrees & certifications",
+        "education & achievements",
+        "education and achievements",
+        "education & acheivements",
+        "education and acheivements",
+        "education & honors",
+        "education and honors",
+        "education & awards",
+        "education and awards",
+        "education & certifications",
+        "education and certifications",
+        "education & activities",
+        "education & qualifications",
     ],
     "skills": [
         "skills",
@@ -79,6 +100,16 @@ SECTION_ALIASES: dict[str, list[str]] = {
         "tools and technologies",
         "technical competencies",
         "it skills",
+        # Issue 4: additional aliases
+        "technical proficiencies",
+        "competencies",
+        "programming languages",
+        "frameworks & libraries",
+        "software & tools",
+        "languages & tools",
+        "tools & frameworks",
+        "relevant skills",
+        "soft skills",
     ],
     "projects": [
         "projects",
@@ -108,6 +139,13 @@ SECTION_ALIASES: dict[str, list[str]] = {
         "certifications & awards",
         "online courses",
         "professional courses",
+        # Issue 5: additional aliases
+        "achievements & certifications",
+        "trainings & certifications",
+        "coursework",
+        "relevant coursework",
+        "moocs",
+        "online learning",
     ],
     "summary": [
         "summary",
@@ -170,12 +208,20 @@ SECTION_ALIASES: dict[str, list[str]] = {
         "hobbies and interests",
         "extracurricular activities",
         "activities",
+        "positions of responsibility",
+        "leadership & activities",
+        "co-curricular activities",
     ],
     "volunteering": [
         "volunteering",
         "volunteer experience",
+        "volunteer work",
+        "voluntary work",
+        "volunteer activities",
+        "volunteering experience",
         "social work",
         "community service",
+        "community involvement",
     ],
 }
 
@@ -205,6 +251,52 @@ def _clean_for_match(text: str) -> str:
     return cleaned
 
 
+def _resolve_section(text: str) -> str | None:
+    """
+    Return the canonical section name for a heading-like block, or None
+    if the heading text does not match any known alias.
+    """
+    cleaned = _clean_for_match(text)
+    if not cleaned:
+        return None
+
+    # 1. Direct alias match
+    if cleaned in _ALIAS_TO_SECTION:
+        return _ALIAS_TO_SECTION[cleaned]
+
+    # 2. Compound headings — e.g. "Education & Achievements", "Skills / Technologies"
+    parts = re.split(r"[\&/\|\+,]|\band\b", cleaned)
+    if len(parts) > 1:
+        for part in parts:
+            p_clean = part.strip()
+            if p_clean in _ALIAS_TO_SECTION:
+                return _ALIAS_TO_SECTION[p_clean]
+
+    # 3. Canonical section keyword fallback for standard resume section headings (only for short lines <= 5 words)
+    if len(cleaned.split()) <= 5:
+        if re.search(r"\b(education|academics?|scholastic|degrees?)\b", cleaned):
+            return "education"
+        if re.search(r"\b(technical skills?|key skills?|core skills?|skills?|technologies|tech stack)\b", cleaned):
+            return "skills"
+        if re.search(r"\b(projects?|academic projects?|personal projects?)\b", cleaned):
+            return "projects"
+        if re.search(r"\b(certif(?:ications?|icates?)|licenses?|credentials?)\b", cleaned):
+            return "certifications"
+        if re.search(r"\b(volunt(?:eer|eering)|community service)\b", cleaned):
+            return "volunteering"
+        if re.search(r"\b(experience|employment|work history|career history)\b", cleaned):
+            if not re.search(r"\b(volunteer|teaching)\b", cleaned):
+                return "experience"
+        if re.search(r"\b(publications?|papers?|patents?)\b", cleaned):
+            return "publications"
+        if re.search(r"\b(awards?|honors?|honours?|achievements?|acheivements?)\b", cleaned):
+            return "awards"
+        if re.search(r"\b(interests?|hobbies|extracurricular)\b", cleaned):
+            return "interests"
+
+    return None
+
+
 def _is_heading(block: TextBlock) -> bool:
     """
     Return True if the block looks like a section heading.
@@ -218,10 +310,8 @@ def _is_heading(block: TextBlock) -> bool:
     if block.block_type == "heading":
         return True
 
-    cleaned = _clean_for_match(text)
-
-    # Rule 2: Direct alias match (most reliable)
-    if cleaned in _ALIAS_TO_SECTION:
+    # Rule 2: Resolves to a known canonical section
+    if _resolve_section(text) is not None:
         return True
 
     # Rules 3 & 4 only apply to short, punctuation-light lines
@@ -242,15 +332,6 @@ def _is_heading(block: TextBlock) -> bool:
         return True
 
     return False
-
-
-def _resolve_section(text: str) -> str | None:
-    """
-    Return the canonical section name for a heading-like block, or None
-    if the heading text does not match any known alias.
-    """
-    cleaned = _clean_for_match(text)
-    return _ALIAS_TO_SECTION.get(cleaned)
 
 
 # ---------------------------------------------------------------------------
@@ -285,12 +366,26 @@ def detect_sections(doc: ResumeDocument) -> dict[str, list[TextBlock]]:
     # Post-process: check header/summary for orphan job blocks (e.g. "Teaching Assistant", date ranges)
     _JOB_TITLE_KEYWORDS = {"assistant", "intern", "developer", "engineer", "manager", "analyst", "lead", "architect", "consultant", "specialist"}
     _DATE_RANGE_RE = re.compile(r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{4})\s*[\-–—\sto]+\s*(?:present|current|now|\d{4})", re.IGNORECASE)
+    _ACADEMIC_KEYWORDS = {
+        "graduation", "university", "college", "school", "degree", "b.tech", "btech",
+        "b.e.", "bachelor", "master", "phd", "cgpa", "gpa", "cpi", "scholarship",
+        "matriculation", "intermediate", "hsc", "ssc", "10th", "12th", "honors list",
+    }
 
     orphan_job_blocks = []
     for sec in ("header", "summary"):
         sec_blocks = sections.get(sec, [])
         for b in sec_blocks:
             b_lower = b.text.lower()
+            # Never treat academic/education blocks as orphan jobs
+            if any(w in b_lower for w in _ACADEMIC_KEYWORDS):
+                # If education section is missing, salvage this block into education
+                if "education" not in sections:
+                    sections["education"] = []
+                if b not in sections["education"]:
+                    sections["education"].append(b)
+                continue
+
             if _DATE_RANGE_RE.search(b_lower) or any(re.search(rf"\b{kw}\b", b_lower) for kw in _JOB_TITLE_KEYWORDS):
                 if not any(token in b_lower for token in ["@gmail", "@yahoo", "linkedin.com", "github.com", "aspiring"]):
                     orphan_job_blocks.append(b)

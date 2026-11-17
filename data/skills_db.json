@@ -4,7 +4,7 @@
     "php", "ruby", "rust", "kotlin", "swift", "matlab",
     "html", "css", "react", "angular", "vue", "nodejs",
     "express", "django", "flask", "fastapi", "spring", "spring boot",
-    "bootstrap", "jquery", "rest api", "rest apis", "graphql", "dotnet", "aspdotnet",
+    "bootstrap", "jquery", "rest api", "graphql", "dotnet", "aspdotnet",
     "grpc", "microservices", "system design",
     "sql", "mysql", "postgresql", "mongodb", "oracle", "sqlite",
     "redis", "cassandra", "dynamodb", "elasticsearch", "bigquery", "redshift",
@@ -12,7 +12,7 @@
     "natural language processing", "computer vision", "data science",
     "data analysis", "statistics", "predictive modeling", "feature engineering",
     "time series", "hypothesis testing", "data modeling", "transformers", "bert",
-    "llm", "llms", "large language models", "rag", "retrieval augmented generation",
+    "llm", "large language models", "rag", "retrieval augmented generation",
     "agentic ai", "ai agents", "prompt engineering", "langchain", "llamaindex",
     "vector database", "vector embeddings", "fine tuning", "gpt", "openai api",
     "huggingface", "chatbot development",
@@ -76,7 +76,15 @@
     "office administration", "scheduling", "vendor coordination", "data entry",
     "calendar management", "travel coordination", "facilities management",
     "records management", "procurement", "inventory management",
-    "supply chain management", "logistics coordination", "front desk operations"
+    "supply chain management", "logistics coordination", "front desk operations",
+    "crewai", "autogen",
+    "streamlit", "gradio",
+    "pyspark", "databricks",
+    "pinecone", "chromadb", "weaviate", "milvus", "qdrant",
+    "supabase", "firebase",
+    "nextjs", "nestjs", "nuxtjs",
+    "tailwindcss",
+    "vercel", "netlify"
   ],
   "skill_aliases": {
     "chartered accountant": "ca",
@@ -112,7 +120,18 @@
     "internal audit": "auditing",
     "internal auditing": "auditing",
     "compliance audit": "auditing",
-    "financial audit": "auditing"
+    "financial audit": "auditing",
+    "rest apis": "rest api",
+    "llms": "llm",
+    "next.js": "nextjs",
+    "nest.js": "nestjs",
+    "nuxt.js": "nuxtjs",
+    "tailwind": "tailwindcss",
+    "tailwind css": "tailwindcss",
+    "chroma": "chromadb",
+    "crew ai": "crewai",
+    "auto gen": "autogen",
+    "py spark": "pyspark"
   },
   "implied_skills": {
     "github": ["git"],
@@ -135,6 +154,15 @@
     "deep learning": ["machine learning", "artificial intelligence"],
     "computer vision": ["deep learning", "machine learning"],
     "nlp": ["machine learning", "artificial intelligence"],
-    "natural language processing": ["nlp", "machine learning"]
+    "natural language processing": ["nlp", "machine learning"],
+    "langchain": ["python", "llm", "large language models"],
+    "llamaindex": ["python", "llm", "large language models"],
+    "crewai": ["python", "ai agents"],
+    "autogen": ["python", "ai agents"],
+    "streamlit": ["python"],
+    "gradio": ["python"],
+    "pyspark": ["python", "apache spark"],
+    "nextjs": ["react", "javascript"],
+    "nestjs": ["nodejs", "typescript"]
   }
 }

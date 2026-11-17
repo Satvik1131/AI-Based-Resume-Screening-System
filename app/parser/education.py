@@ -21,6 +21,7 @@ _PATTERNS: list[tuple[str, list[str]]] = [
     ("Doctorate", [
         r"\bph\s*\.?\s*d\b", r"\bdoctorate\b", r"\bdoctor of\b",
         r"\bd\s*\.?\s*sc\b", r"\bd\s*\.?\s*litt\b", r"\bedd\b", r"\bd\s*\.?\s*phil\b",
+        r"\bphd\b",
     ]),
     ("Master", [
         r"\bm\s*\.?\s*tech\b", r"\bm\s*\.?\s*e\b", r"\bm\s*\.?\s*sc\b", r"\bm\s*\.?\s*s\b",
@@ -28,6 +29,8 @@ _PATTERNS: list[tuple[str, list[str]]] = [
         r"\bmaster\b", r"\bpost.?graduate\b", r"\bpg\b",
         r"\bm\s*\.?\s*eng\b", r"\bpgd\b", r"\bpgdm\b", r"\bm\s*\.?\s*phil\b",
         r"\bmaster of\b",
+        r"\bllm\b", r"\bm\s*\.?\s*pharm\b",
+        r"\bmtech\b",
     ]),
     ("Bachelor", [
         r"\bb\s*\.?\s*tech\b", r"\bb\s*\.?\s*e\b", r"\bb\s*\.?\s*sc\b", r"\bb\s*\.?\s*a\b",
@@ -35,13 +38,19 @@ _PATTERNS: list[tuple[str, list[str]]] = [
         r"\bb\s*\.?\s*pharm\b", r"\bbachelor\b", r"\bundergraduate\b",
         r"\bb\s*\.?\s*eng\b", r"\bbs\b", r"\bba\b", r"\bbachelor of\b",
         r"\bbachelors?\b",
+        r"\bbtec?h?\b", r"\bbeng\b",
+        r"\bllb\b", r"\bmbbs\b", r"\bbds\b",
+        r"\bbpharm\b",
     ]),
     ("Diploma", [
         r"\bdiploma\b", r"\bpolytechnic\b", r"\bpoly\b",
         r"\bassociate\b", r"\bcertificate\b", r"\badvanced diploma\b",
         r"\bssc\b", r"\bhsc\b", r"\binter\b",
+        r"\bhigh\s+school\b", r"\bsenior\s+secondary\b",
+        r"\b12th\b", r"\b10\+?2\b", r"\b10th\b",
     ]),
 ]
+
 
 # Pre-compile patterns
 _COMPILED_PATTERNS: list[tuple[str, list[re.Pattern]]] = [
