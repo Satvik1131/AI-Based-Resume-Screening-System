@@ -1,0 +1,28 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.venv_new/
+
+# Debug / output files (auto-generated at runtime)
+extraction_debug.json
+
+# Test launcher (dev-only)
+test_run.py
+
+# Misc
+presentation_graphs/
+*.swp
+.DS_Store
+Thumbs.db
+
+ipdocs/
+.env
+.env.*
+!.env.example

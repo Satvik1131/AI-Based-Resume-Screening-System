@@ -1,0 +1,1320 @@
+[
+  {
+    "domain": "Data Science",
+    "role": "Machine Learning Engineer",
+    "required_skills": [
+      "python",
+      "pytorch",
+      "docker",
+      "sql",
+      "scikit learn",
+      "git"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "pytorch",
+      "git",
+      "python"
+    ],
+    "candidate_missing_skills": [
+      "docker",
+      "sql",
+      "scikit learn"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "Data Analyst",
+    "required_skills": [
+      "python",
+      "sql",
+      "data analysis",
+      "tableau",
+      "excel"
+    ],
+    "required_experience_years": 2,
+    "candidate_skills": [
+      "sql",
+      "excel"
+    ],
+    "candidate_missing_skills": [
+      "python",
+      "data analysis",
+      "tableau"
+    ],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "NLP Data Scientist",
+    "required_skills": [
+      "python",
+      "nlp",
+      "transformers",
+      "pytorch",
+      "huggingface",
+      "sql"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "huggingface",
+      "pytorch",
+      "nlp",
+      "sql"
+    ],
+    "candidate_missing_skills": [
+      "python",
+      "transformers"
+    ],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "dual_borderline",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "kubernetes",
+      "jenkins",
+      "docker",
+      "aws"
+    ],
+    "candidate_missing_skills": [
+      "terraform",
+      "linux"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "Machine Learning Engineer",
+    "required_skills": [
+      "python",
+      "pytorch",
+      "docker",
+      "sql",
+      "scikit learn",
+      "git"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "python",
+      "pytorch",
+      "docker",
+      "sql",
+      "scikit learn",
+      "git"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "aws",
+      "terraform",
+      "jenkins",
+      "kubernetes"
+    ],
+    "candidate_missing_skills": [
+      "docker",
+      "linux"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "jenkins",
+      "docker",
+      "kubernetes"
+    ],
+    "candidate_missing_skills": [
+      "aws",
+      "terraform",
+      "linux"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Backend Python Developer",
+    "required_skills": [
+      "python",
+      "fastapi",
+      "postgresql",
+      "docker",
+      "redis",
+      "git"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "python",
+      "fastapi",
+      "postgresql",
+      "docker",
+      "redis",
+      "git"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 1,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "linux",
+      "docker",
+      "jenkins",
+      "terraform"
+    ],
+    "candidate_missing_skills": [
+      "aws",
+      "kubernetes"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "aws",
+      "docker",
+      "jenkins"
+    ],
+    "candidate_missing_skills": [
+      "kubernetes",
+      "terraform",
+      "linux"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Cyber Security",
+    "role": "Security Analyst",
+    "required_skills": [
+      "network security",
+      "siem",
+      "wireshark",
+      "vulnerability assessment",
+      "incident response"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "incident response",
+      "wireshark"
+    ],
+    "candidate_missing_skills": [
+      "network security",
+      "siem",
+      "vulnerability assessment"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Cyber Security",
+    "role": "Security Analyst",
+    "required_skills": [
+      "network security",
+      "siem",
+      "wireshark",
+      "vulnerability assessment",
+      "incident response"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "wireshark",
+      "siem",
+      "network security"
+    ],
+    "candidate_missing_skills": [
+      "vulnerability assessment",
+      "incident response"
+    ],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "dual_borderline",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "Site Reliability Engineer",
+    "required_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "kubernetes",
+      "docker",
+      "grafana",
+      "linux"
+    ],
+    "candidate_missing_skills": [
+      "prometheus",
+      "python"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "NLP Data Scientist",
+    "required_skills": [
+      "python",
+      "nlp",
+      "transformers",
+      "pytorch",
+      "huggingface",
+      "sql"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "sql",
+      "pytorch",
+      "python"
+    ],
+    "candidate_missing_skills": [
+      "nlp",
+      "transformers",
+      "huggingface"
+    ],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "dual_borderline",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Cyber Security",
+    "role": "Security Analyst",
+    "required_skills": [
+      "network security",
+      "siem",
+      "wireshark",
+      "vulnerability assessment",
+      "incident response"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "incident response",
+      "network security",
+      "wireshark"
+    ],
+    "candidate_missing_skills": [
+      "siem",
+      "vulnerability assessment"
+    ],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "dual_borderline",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "Generative AI Engineer",
+    "required_skills": [
+      "python",
+      "llm",
+      "rag",
+      "langchain",
+      "vector database",
+      "docker"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "rag",
+      "langchain",
+      "llm",
+      "vector database"
+    ],
+    "candidate_missing_skills": [
+      "python",
+      "docker"
+    ],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "dual_borderline",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "jenkins",
+      "kubernetes",
+      "docker",
+      "aws"
+    ],
+    "candidate_missing_skills": [
+      "terraform",
+      "linux"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Java Backend Engineer",
+    "required_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "required_experience_years": 5,
+    "candidate_skills": [
+      "docker",
+      "microservices",
+      "mysql",
+      "java"
+    ],
+    "candidate_missing_skills": [
+      "spring boot",
+      "git"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "Site Reliability Engineer",
+    "required_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "python",
+      "linux",
+      "docker"
+    ],
+    "candidate_missing_skills": [
+      "kubernetes",
+      "prometheus",
+      "grafana"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Cyber Security",
+    "role": "Security Analyst",
+    "required_skills": [
+      "network security",
+      "siem",
+      "wireshark",
+      "vulnerability assessment",
+      "incident response"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "siem",
+      "vulnerability assessment",
+      "wireshark"
+    ],
+    "candidate_missing_skills": [
+      "network security",
+      "incident response"
+    ],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "dual_borderline",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "Site Reliability Engineer",
+    "required_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "docker",
+      "kubernetes",
+      "prometheus",
+      "python"
+    ],
+    "candidate_missing_skills": [
+      "linux",
+      "grafana"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "Site Reliability Engineer",
+    "required_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "kubernetes",
+      "docker",
+      "linux",
+      "python"
+    ],
+    "candidate_missing_skills": [
+      "prometheus",
+      "grafana"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Java Backend Engineer",
+    "required_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "required_experience_years": 5,
+    "candidate_skills": [
+      "git",
+      "java",
+      "spring boot"
+    ],
+    "candidate_missing_skills": [
+      "microservices",
+      "mysql",
+      "docker"
+    ],
+    "candidate_experience_years": 5,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "Generative AI Engineer",
+    "required_skills": [
+      "python",
+      "llm",
+      "rag",
+      "langchain",
+      "vector database",
+      "docker"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "rag",
+      "langchain",
+      "llm"
+    ],
+    "candidate_missing_skills": [
+      "python",
+      "vector database",
+      "docker"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Java Backend Engineer",
+    "required_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "required_experience_years": 5,
+    "candidate_skills": [
+      "spring boot",
+      "mysql",
+      "docker",
+      "java"
+    ],
+    "candidate_missing_skills": [
+      "microservices",
+      "git"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "Data Analyst",
+    "required_skills": [
+      "python",
+      "sql",
+      "data analysis",
+      "tableau",
+      "excel"
+    ],
+    "required_experience_years": 2,
+    "candidate_skills": [
+      "python",
+      "sql",
+      "data analysis",
+      "tableau",
+      "excel"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 1,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "Machine Learning Engineer",
+    "required_skills": [
+      "python",
+      "pytorch",
+      "docker",
+      "sql",
+      "scikit learn",
+      "git"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "docker",
+      "python",
+      "pytorch"
+    ],
+    "candidate_missing_skills": [
+      "sql",
+      "scikit learn",
+      "git"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Java Backend Engineer",
+    "required_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "required_experience_years": 5,
+    "candidate_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "Site Reliability Engineer",
+    "required_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "linux",
+      "grafana",
+      "docker",
+      "python"
+    ],
+    "candidate_missing_skills": [
+      "kubernetes",
+      "prometheus"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "Machine Learning Engineer",
+    "required_skills": [
+      "python",
+      "pytorch",
+      "docker",
+      "sql",
+      "scikit learn",
+      "git"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "sql",
+      "git",
+      "pytorch"
+    ],
+    "candidate_missing_skills": [
+      "python",
+      "docker",
+      "scikit learn"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "NLP Data Scientist",
+    "required_skills": [
+      "python",
+      "nlp",
+      "transformers",
+      "pytorch",
+      "huggingface",
+      "sql"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "python",
+      "nlp",
+      "transformers",
+      "pytorch",
+      "huggingface",
+      "sql"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 1,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "Site Reliability Engineer",
+    "required_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Cyber Security",
+    "role": "Security Analyst",
+    "required_skills": [
+      "network security",
+      "siem",
+      "wireshark",
+      "vulnerability assessment",
+      "incident response"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "network security",
+      "incident response"
+    ],
+    "candidate_missing_skills": [
+      "siem",
+      "wireshark",
+      "vulnerability assessment"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "linux",
+      "jenkins",
+      "docker"
+    ],
+    "candidate_missing_skills": [
+      "aws",
+      "kubernetes",
+      "terraform"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "NLP Data Scientist",
+    "required_skills": [
+      "python",
+      "nlp",
+      "transformers",
+      "pytorch",
+      "huggingface",
+      "sql"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "sql",
+      "nlp",
+      "pytorch"
+    ],
+    "candidate_missing_skills": [
+      "python",
+      "transformers",
+      "huggingface"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Java Backend Engineer",
+    "required_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "required_experience_years": 5,
+    "candidate_skills": [
+      "java",
+      "mysql",
+      "microservices"
+    ],
+    "candidate_missing_skills": [
+      "spring boot",
+      "docker",
+      "git"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Java Backend Engineer",
+    "required_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "required_experience_years": 5,
+    "candidate_skills": [
+      "microservices",
+      "mysql",
+      "spring boot"
+    ],
+    "candidate_missing_skills": [
+      "java",
+      "docker",
+      "git"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "Site Reliability Engineer",
+    "required_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "Data Analyst",
+    "required_skills": [
+      "python",
+      "sql",
+      "data analysis",
+      "tableau",
+      "excel"
+    ],
+    "required_experience_years": 2,
+    "candidate_skills": [
+      "python",
+      "excel",
+      "data analysis"
+    ],
+    "candidate_missing_skills": [
+      "sql",
+      "tableau"
+    ],
+    "candidate_experience_years": 1,
+    "borderline_mechanism": "dual_borderline",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "Site Reliability Engineer",
+    "required_skills": [
+      "linux",
+      "kubernetes",
+      "prometheus",
+      "grafana",
+      "python",
+      "docker"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "python",
+      "prometheus",
+      "linux"
+    ],
+    "candidate_missing_skills": [
+      "kubernetes",
+      "grafana",
+      "docker"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "aws",
+      "linux",
+      "docker"
+    ],
+    "candidate_missing_skills": [
+      "kubernetes",
+      "terraform",
+      "jenkins"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "DevOps",
+    "role": "DevOps / Cloud Engineer",
+    "required_skills": [
+      "aws",
+      "docker",
+      "kubernetes",
+      "terraform",
+      "linux",
+      "jenkins"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "jenkins",
+      "kubernetes",
+      "terraform",
+      "docker"
+    ],
+    "candidate_missing_skills": [
+      "aws",
+      "linux"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "dual_borderline",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Data Science",
+    "role": "Data Analyst",
+    "required_skills": [
+      "python",
+      "sql",
+      "data analysis",
+      "tableau",
+      "excel"
+    ],
+    "required_experience_years": 2,
+    "candidate_skills": [
+      "python",
+      "sql",
+      "data analysis",
+      "tableau",
+      "excel"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 1,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Java Backend Engineer",
+    "required_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "required_experience_years": 5,
+    "candidate_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 2,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Cyber Security",
+    "role": "Security Analyst",
+    "required_skills": [
+      "network security",
+      "siem",
+      "wireshark",
+      "vulnerability assessment",
+      "incident response"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "siem",
+      "network security"
+    ],
+    "candidate_missing_skills": [
+      "wireshark",
+      "vulnerability assessment",
+      "incident response"
+    ],
+    "candidate_experience_years": 3,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "functional",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Full Stack Developer",
+    "required_skills": [
+      "react",
+      "typescript",
+      "nodejs",
+      "postgresql",
+      "rest apis",
+      "docker"
+    ],
+    "required_experience_years": 4,
+    "candidate_skills": [
+      "nodejs",
+      "react",
+      "docker"
+    ],
+    "candidate_missing_skills": [
+      "typescript",
+      "postgresql",
+      "rest apis"
+    ],
+    "candidate_experience_years": 4,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Java Backend Engineer",
+    "required_skills": [
+      "java",
+      "spring boot",
+      "microservices",
+      "mysql",
+      "docker",
+      "git"
+    ],
+    "required_experience_years": 5,
+    "candidate_skills": [
+      "docker",
+      "mysql",
+      "spring boot"
+    ],
+    "candidate_missing_skills": [
+      "java",
+      "microservices",
+      "git"
+    ],
+    "candidate_experience_years": 5,
+    "borderline_mechanism": "skill_shortfall",
+    "style": "chronological",
+    "intended_label": "partial match"
+  },
+  {
+    "domain": "Software Development",
+    "role": "Backend Python Developer",
+    "required_skills": [
+      "python",
+      "fastapi",
+      "postgresql",
+      "docker",
+      "redis",
+      "git"
+    ],
+    "required_experience_years": 3,
+    "candidate_skills": [
+      "python",
+      "fastapi",
+      "postgresql",
+      "docker",
+      "redis",
+      "git"
+    ],
+    "candidate_missing_skills": [],
+    "candidate_experience_years": 1,
+    "borderline_mechanism": "exp_shortfall",
+    "style": "modern-tech",
+    "intended_label": "partial match"
+  }
+]

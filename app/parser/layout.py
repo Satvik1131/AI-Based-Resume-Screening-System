@@ -1,0 +1,564 @@
+"""
+Layout-aware document parser.
+
+Priority order for PDF:
+  1. Docling   — structured blocks, headings, tables, lists, reading order
+  2. PyMuPDF   — two-column aware block sorting
+  3. pdfplumber — plain text fallback
+  4. OCR        — pytesseract for scanned/image-only PDFs
+
+For DOCX:
+  1. Docling
+  2. python-docx (with paragraph style detection)
+
+For images (.jpg, .png, etc.):
+  1. pytesseract OCR
+
+Every path returns a ResumeDocument with a blocks list and a raw_text string.
+"""
+from __future__ import annotations
+
+import os
+import logging
+from dataclasses import dataclass, field
+from typing import Optional
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Data model
+# ---------------------------------------------------------------------------
+
+@dataclass
+class TextBlock:
+    text: str
+    block_type: str       # "heading" | "paragraph" | "list_item" | "table_cell" | "text"
+    page: int = 0
+    bbox: Optional[tuple] = None   # (x0, y0, x1, y1) — None for non-spatial sources
+    is_bold: bool = False
+    font_size: float = 0.0
+
+
+@dataclass
+class ResumeDocument:
+    blocks: list[TextBlock] = field(default_factory=list)
+    raw_text: str = ""            # Full concatenated text (compat. with feature_builder)
+    source_path: str = ""
+    parser_used: str = "unknown"
+    parser_warnings: list[str] = field(default_factory=list)  # diagnostic log of parser chain
+
+
+# ---------------------------------------------------------------------------
+# 1. Docling parser
+# ---------------------------------------------------------------------------
+
+def _parse_with_docling(file_path: str) -> Optional[ResumeDocument]:
+    """
+    Use Docling to parse the document into a structured ResumeDocument.
+    Handles PDF, DOCX, and other formats supported by Docling.
+    Returns None if Docling is not installed or conversion fails.
+    """
+    try:
+        from docling.document_converter import DocumentConverter
+        logger.info("[Parser] Trying Docling for: %s", file_path)
+
+        converter = DocumentConverter()
+        result = converter.convert(file_path)
+        doc = result.document
+
+        blocks: list[TextBlock] = []
+
+        # Iterate over all document items in reading order
+        for element, _level in doc.iterate_items():
+            # Resolve page number safely
+            page_no = 0
+            if hasattr(element, "prov") and element.prov:
+                try:
+                    page_no = element.prov[0].page_no
+                except (AttributeError, IndexError):
+                    pass
+
+            element_text = ""
+            if hasattr(element, "text"):
+                element_text = (element.text or "").strip()
+
+            if not element_text:
+                continue
+
+            # Classify by Docling element type (handle name changes across versions)
+            cls_name = type(element).__name__
+
+            if "SectionHeader" in cls_name or "Heading" in cls_name:
+                blocks.append(TextBlock(
+                    text=element_text,
+                    block_type="heading",
+                    page=page_no,
+                ))
+
+            elif "List" in cls_name:
+                blocks.append(TextBlock(
+                    text=element_text,
+                    block_type="list_item",
+                    page=page_no,
+                ))
+
+            elif "Table" in cls_name:
+                # Try DataFrame export; fall back to markdown text
+                try:
+                    df = element.export_to_dataframe()
+                    for _, row in df.iterrows():
+                        for cell_val in row:
+                            cell_text = str(cell_val).strip()
+                            if cell_text and cell_text.lower() != "nan":
+                                blocks.append(TextBlock(
+                                    text=cell_text,
+                                    block_type="table_cell",
+                                    page=page_no,
+                                ))
+                except Exception:
+                    # Fallback: get markdown of the table
+                    try:
+                        md = element.export_to_markdown()
+                        if md:
+                            blocks.append(TextBlock(
+                                text=md.strip(),
+                                block_type="table_cell",
+                                page=page_no,
+                            ))
+                    except Exception:
+                        pass
+
+            elif "Text" in cls_name or "Paragraph" in cls_name:
+                blocks.append(TextBlock(
+                    text=element_text,
+                    block_type="paragraph",
+                    page=page_no,
+                ))
+
+            else:
+                # Unknown element type — include as paragraph
+                blocks.append(TextBlock(
+                    text=element_text,
+                    block_type="paragraph",
+                    page=page_no,
+                ))
+
+        if not blocks:
+            # Docling parsed something but yielded no text blocks — try markdown export
+            try:
+                md = doc.export_to_markdown()
+                if md and md.strip():
+                    return _parse_markdown_to_document(md, file_path, "docling_md")
+            except Exception:
+                pass
+            return None
+
+        raw_text = "\n".join(b.text for b in blocks if b.text)
+        logger.info("[Parser] ✓ Docling succeeded — %d blocks extracted", len(blocks))
+        return ResumeDocument(
+            blocks=blocks,
+            raw_text=raw_text,
+            source_path=file_path,
+            parser_used="docling",
+        )
+
+    except ImportError:
+        logger.info("[Parser] ✗ Docling not installed — skipping")
+        return None
+    except Exception as exc:
+        logger.warning("[Parser] ✗ Docling failed: %s — trying next parser", exc)
+        return None
+
+
+def _parse_markdown_to_document(
+    md_text: str, source_path: str, parser_label: str
+) -> ResumeDocument:
+    """Convert markdown text into TextBlocks by interpreting # headings and bullet lists."""
+    import re
+    blocks: list[TextBlock] = []
+    for line in md_text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("#"):
+            heading_text = stripped.lstrip("#").strip()
+            blocks.append(TextBlock(text=heading_text, block_type="heading"))
+        elif stripped.startswith(("-", "*", "•", "·")):
+            item_text = re.sub(r"^[-*•·]\s*", "", stripped)
+            blocks.append(TextBlock(text=item_text, block_type="list_item"))
+        else:
+            blocks.append(TextBlock(text=stripped, block_type="paragraph"))
+    raw_text = "\n".join(b.text for b in blocks)
+    return ResumeDocument(
+        blocks=blocks, raw_text=raw_text,
+        source_path=source_path, parser_used=parser_label,
+    )
+
+
+# ---------------------------------------------------------------------------
+# 2. PyMuPDF fallback — two-column aware
+# ---------------------------------------------------------------------------
+
+def _parse_with_pymupdf(file_path: str) -> Optional[ResumeDocument]:
+    """
+    Extract text from PDF using PyMuPDF with two-column reconstruction.
+    Blocks are sorted top-to-bottom in 20px row buckets, then left-to-right,
+    so left-column text precedes right-column text on the same visual row.
+    """
+    try:
+        import fitz  # PyMuPDF
+        logger.info("[Parser] Trying PyMuPDF for: %s", file_path)
+
+        doc_fitz = fitz.open(file_path)
+        blocks: list[TextBlock] = []
+
+        for page_num, page in enumerate(doc_fitz, start=1):
+            rect = page.rect
+            page_width = rect.width
+            raw_blocks = page.get_text("dict")["blocks"]
+            text_blocks = [b for b in raw_blocks if b.get("type") == 0]
+            if not text_blocks:
+                continue
+
+            # Detect two-column layout: check if blocks exist on both left and right sides
+            left_side_blocks = [b for b in text_blocks if b["bbox"][0] < page_width * 0.42 and b["bbox"][1] > 100]
+            right_side_blocks = [b for b in text_blocks if b["bbox"][0] >= page_width * 0.42 and b["bbox"][1] > 100]
+
+            is_two_column = len(left_side_blocks) >= 2 and len(right_side_blocks) >= 2
+
+            if is_two_column:
+                # 1. Top full-width header (y < 100)
+                header_blocks = [b for b in text_blocks if b["bbox"][1] <= 100]
+                header_blocks.sort(key=lambda b: (b["bbox"][1], b["bbox"][0]))
+
+                # 2. Left column (x < 0.42 * width), sorted top-to-bottom
+                left_blocks = [b for b in text_blocks if b["bbox"][1] > 100 and b["bbox"][0] < page_width * 0.42]
+                left_blocks.sort(key=lambda b: (b["bbox"][1], b["bbox"][0]))
+
+                # 3. Right column (x >= 0.42 * width), sorted top-to-bottom
+                right_blocks = [b for b in text_blocks if b["bbox"][1] > 100 and b["bbox"][0] >= page_width * 0.42]
+                right_blocks.sort(key=lambda b: (b["bbox"][1], b["bbox"][0]))
+
+                ordered_blocks = header_blocks + left_blocks + right_blocks
+            else:
+                # Single column: sort by y-position (20px tolerance) then x-position
+                text_blocks.sort(key=lambda b: (round(b["bbox"][1] / 20) * 20, b["bbox"][0]))
+                ordered_blocks = text_blocks
+
+            for blk in ordered_blocks:
+                for line in blk.get("lines", []):
+                    spans = line.get("spans", [])
+                    if not spans:
+                        continue
+                    
+                    line_parts = []
+                    max_font_size = 0.0
+                    has_bold = False
+                    first_bbox = None
+
+                    for span in spans:
+                        span_text = (span.get("text") or "").strip()
+                        if not span_text:
+                            continue
+                        line_parts.append(span_text)
+                        flags = span.get("flags", 0)
+                        if bool(flags & (1 << 4)):
+                            has_bold = True
+                        fs = float(span.get("size", 0.0))
+                        if fs > max_font_size:
+                            max_font_size = fs
+                        if first_bbox is None:
+                            first_bbox = tuple(span.get("bbox", ()))
+
+                    if not line_parts:
+                        continue
+
+                    full_line_text = " ".join(line_parts).strip()
+                    blocks.append(TextBlock(
+                        text=full_line_text,
+                        block_type="text",
+                        page=page_num,
+                        bbox=first_bbox,
+                        is_bold=has_bold,
+                        font_size=max_font_size,
+                    ))
+
+        if not blocks:
+            logger.info("[Parser] ✗ PyMuPDF found no text blocks (scanned PDF?)")
+            return None
+
+        raw_text = "\n".join(b.text for b in blocks if b.text)
+        logger.info("[Parser] ✓ PyMuPDF succeeded — %d blocks extracted", len(blocks))
+        return ResumeDocument(
+            blocks=blocks,
+            raw_text=raw_text,
+            source_path=file_path,
+            parser_used="pymupdf",
+        )
+
+    except ImportError:
+        logger.info("[Parser] ✗ PyMuPDF (fitz) not installed — skipping")
+        return None
+    except Exception as exc:
+        logger.warning("[Parser] ✗ PyMuPDF failed: %s — trying next parser", exc)
+        return None
+
+
+# ---------------------------------------------------------------------------
+# 3. pdfplumber fallback
+# ---------------------------------------------------------------------------
+
+def _parse_with_pdfplumber(file_path: str) -> Optional[ResumeDocument]:
+    try:
+        import pdfplumber
+        logger.info("[Parser] Trying pdfplumber for: %s", file_path)
+
+        parts: list[str] = []
+        with pdfplumber.open(file_path) as pdf:
+            for page in pdf.pages:
+                t = page.extract_text()
+                if t:
+                    parts.append(t)
+
+        if not parts:
+            logger.info("[Parser] ✗ pdfplumber found no text")
+            return None
+
+        raw_text = "\n".join(parts)
+        blocks = [
+            TextBlock(text=line.strip(), block_type="paragraph")
+            for line in raw_text.splitlines()
+            if line.strip()
+        ]
+        logger.info("[Parser] ✓ pdfplumber succeeded — %d lines extracted", len(blocks))
+        return ResumeDocument(
+            blocks=blocks,
+            raw_text=raw_text,
+            source_path=file_path,
+            parser_used="pdfplumber",
+        )
+
+    except Exception as exc:
+        logger.warning("[Parser] ✗ pdfplumber failed: %s", exc)
+        return None
+
+
+# ---------------------------------------------------------------------------
+# 4. python-docx parser
+# ---------------------------------------------------------------------------
+
+def _parse_docx(file_path: str) -> Optional[ResumeDocument]:
+    try:
+        import docx as python_docx
+
+        document = python_docx.Document(file_path)
+        blocks: list[TextBlock] = []
+
+        for para in document.paragraphs:
+            text = para.text.strip()
+            if not text:
+                continue
+            style_name = (para.style.name or "").lower()
+            if "heading" in style_name:
+                block_type = "heading"
+            elif "list" in style_name:
+                block_type = "list_item"
+            else:
+                block_type = "paragraph"
+            is_bold = any(run.bold for run in para.runs if run.bold is not None)
+            blocks.append(TextBlock(
+                text=text,
+                block_type=block_type,
+                is_bold=is_bold,
+            ))
+
+        for table in document.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    cell_text = cell.text.strip()
+                    if cell_text:
+                        blocks.append(TextBlock(text=cell_text, block_type="table_cell"))
+
+        if not blocks:
+            return None
+
+        raw_text = "\n".join(b.text for b in blocks)
+        return ResumeDocument(
+            blocks=blocks,
+            raw_text=raw_text,
+            source_path=file_path,
+            parser_used="docx",
+        )
+
+    except Exception:
+        return None
+
+
+# ---------------------------------------------------------------------------
+# 5. OCR fallback
+# ---------------------------------------------------------------------------
+
+def _parse_with_ocr(file_path: str) -> Optional[ResumeDocument]:
+    try:
+        logger.info("[Parser] Trying OCR for: %s", file_path)
+        ext = os.path.splitext(file_path)[1].lower()
+
+        # Method A: Try RapidOCR (ONNX pure Python engine, zero native Tesseract installation required)
+        try:
+            from rapidocr_onnxruntime import RapidOCR
+            ocr_engine = RapidOCR()
+            result, _ = ocr_engine(file_path)
+            if result:
+                lines = [item[1].strip() for item in result if item[1].strip()]
+                all_text = "\n".join(lines)
+                if all_text.strip():
+                    blocks = [TextBlock(text=l, block_type="paragraph") for l in lines]
+                    logger.info("[Parser] ✓ RapidOCR succeeded — %d lines extracted", len(blocks))
+                    return ResumeDocument(
+                        blocks=blocks,
+                        raw_text=all_text,
+                        source_path=file_path,
+                        parser_used="rapidocr",
+                    )
+        except Exception as exc:
+            logger.info("[Parser] RapidOCR attempt skipped: %s", exc)
+
+        # Method B: Fallback to pytesseract
+        pages = []
+        if ext == ".pdf":
+            from pdf2image import convert_from_path
+            pages = convert_from_path(file_path)
+        else:
+            from PIL import Image
+            pages = [Image.open(file_path)]
+
+        import pytesseract
+        all_text = "\n".join(pytesseract.image_to_string(p) for p in pages)
+
+        if not all_text.strip():
+            logger.info("[Parser] ✗ OCR produced no text")
+            return None
+
+        blocks = [
+            TextBlock(text=line.strip(), block_type="paragraph")
+            for line in all_text.splitlines()
+            if line.strip()
+        ]
+        logger.info("[Parser] ✓ pytesseract succeeded — %d lines extracted", len(blocks))
+        return ResumeDocument(
+            blocks=blocks,
+            raw_text=all_text,
+            source_path=file_path,
+            parser_used="ocr",
+        )
+
+    except ImportError as exc:
+        logger.warning("[Parser] ✗ OCR dependencies not installed (%s) — install pdf2image and pytesseract", exc)
+        return None
+    except Exception as exc:
+        logger.warning("[Parser] ✗ OCR failed: %s", exc)
+        return None
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+def parse_resume_document(file_path: str) -> ResumeDocument:
+    """
+    Parse a resume file into a structured ResumeDocument.
+
+    Format dispatch + fallback chain:
+      PDF  → Docling → PyMuPDF → pdfplumber → OCR
+      DOCX → Docling → python-docx
+      Image (.jpg, .png, …) → OCR
+      TXT  → plain read
+    """
+    ext = os.path.splitext(file_path)[1].lower()
+    logger.info("[Parser] Parsing file: %s (format: %s)", file_path, ext)
+    warnings: list[str] = []
+
+    if ext in (".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp"):
+        doc = _parse_with_ocr(file_path)
+        if doc:
+            return doc
+        warnings.append("OCR failed for image file")
+        return _empty_document(file_path, "ocr_failed", warnings)
+
+    if ext == ".txt":
+        try:
+            raw = open(file_path, "r", encoding="utf-8", errors="ignore").read()
+            blocks = [
+                TextBlock(text=line.strip(), block_type="paragraph")
+                for line in raw.splitlines()
+                if line.strip()
+            ]
+            logger.info("[Parser] ✓ TXT read — %d lines", len(blocks))
+            return ResumeDocument(
+                blocks=blocks, raw_text=raw,
+                source_path=file_path, parser_used="txt",
+            )
+        except Exception as exc:
+            warnings.append(f"TXT read failed: {exc}")
+            return _empty_document(file_path, "txt_failed", warnings)
+
+    if ext == ".docx":
+        for parser_fn, name in [(_parse_docx, "python-docx"), (_parse_with_docling, "Docling")]:
+            doc = parser_fn(file_path)
+            if doc:
+                return doc
+            warnings.append(f"{name} failed for DOCX")
+        return _empty_document(file_path, "docx_failed", warnings)
+
+    if ext == ".pdf":
+        # 1. Analyze layout complexity with LayoutRouter
+        try:
+            from app.parser.router import analyze_document_layout
+            layout_info = analyze_document_layout(file_path)
+            logger.info("[Parser] Router recommendation: %s (complexity: %s)", layout_info.recommended_path, layout_info.complexity.value)
+
+            if layout_info.recommended_path == "heavy":
+                try:
+                    from app.parser.vision_models import parse_with_vision_model
+                    v_doc = parse_with_vision_model(file_path)
+                    if v_doc:
+                        v_doc.parser_warnings = warnings
+                        return v_doc
+                    warnings.append("Vision heavy path returned None; falling back to standard pipeline")
+                except Exception as exc:
+                    warnings.append(f"Vision heavy path failed: {exc}")
+        except Exception as exc:
+            logger.warning("[Parser] Layout router check skipped: %s", exc)
+
+        # 2. Standard fast fallback chain
+        for parser_fn, name in [
+            (_parse_with_pymupdf, "PyMuPDF"),
+            (_parse_with_docling, "Docling"),
+            (_parse_with_pdfplumber, "pdfplumber"),
+            (_parse_with_ocr, "OCR"),
+        ]:
+            doc = parser_fn(file_path)
+            if doc:
+                doc.parser_warnings = warnings  # attach chain history
+                return doc
+            warnings.append(f"{name} failed")
+
+        logger.error("[Parser] ✗ ALL parsers failed for PDF: %s", file_path)
+        return _empty_document(file_path, "pdf_failed", warnings)
+
+    # Unsupported extension — try Docling anyway
+    doc = _parse_with_docling(file_path)
+    if doc:
+        return doc
+    warnings.append(f"Unsupported extension '{ext}' and Docling failed")
+    return _empty_document(file_path, f"unsupported_{ext}", warnings)
+
+
+def _empty_document(file_path: str, reason: str, warnings: list[str] | None = None) -> ResumeDocument:
+    logger.warning("[Parser] Returning empty document for '%s' — reason: %s", file_path, reason)
+    return ResumeDocument(
+        source_path=file_path,
+        parser_used=reason,
+        parser_warnings=warnings or [f"All parsers failed: {reason}"],
+    )
